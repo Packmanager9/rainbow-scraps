@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<div class="gamepage-wrapper">
+
+    <!-- Basic header. Should hold simple branding and navigation. -->
+
+
+    <!-- Container for page content. Contains and aligns instructions, game, and ads. -->
+    <div class="game-content-container">
+
+        <!-- Left side banner. Should contain instuctions for the game. -->
+        <aside class="gamepage-left-aside">
+            <h2>Bounce</h2>
+            <ul>
+                <li> Use your mouse to move the paddles.</li>
+                <li> You get 100 balls in your play, starting in the center.</li>
+                <li> Balls get smaller when they hit a wall, but slightly bigger when you hit them with a paddle.</li>
+                <li> When the ball gets too small, it is gone.</li>
+                <li id="score"></li>
+                <li id="balls">Balls left: 100</li>
+
+            </ul>
+        </aside>
+
+        <!-- Game container. Holds the game for this page scaled to fit.  -->
+
+        <div class="game-container">
+
+            <div id="dog-image-container">
+
+                <canvas id="canvas" width="1050" height="700"></canvas>
+
+                <script src="cards.js"></script>
+            </div id="go">
+        </div>
+
+        <!-- Right side banner. No content for now. Perhaps ad-space in the future. -->
+        <aside class="gamepage-right-aside">
+            <!-- Add content here later. -->
+        </aside>
+    </div>
+
+    <!-- Simple footer. Just a copyright notice. -->
+    <footer class="games-footer">
+    </footer>
+
+</div>
+
+</html>
