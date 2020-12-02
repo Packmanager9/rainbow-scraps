@@ -1,7 +1,4 @@
 
-
-let song = new Audio()
-song.src = `primes3.mp3`
 window.addEventListener('DOMContentLoaded', (event) => {
     const gamepadAPI = {
         controller: {},
@@ -434,7 +431,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
         isPointInside(point) { // rough approximation
-            this.body.radius = this.size - (this.size * .293)
+            this.body.radius = this.size *2
             if (this.sides <= 2) {
                 return false
             }
@@ -480,16 +477,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.nodes.push(node)
                 this.angle += this.angleIncrement
             }
-            canvas_context.strokeStyle = "black"
+            canvas_context.strokeStyle = this.color
             canvas_context.fillStyle = this.color
-            canvas_context.lineWidth = 2
+            canvas_context.lineWidth = 0
             canvas_context.beginPath()
             canvas_context.moveTo(this.nodes[0].x, this.nodes[0].y)
             for (let t = 1; t < this.nodes.length; t++) {
                 canvas_context.lineTo(this.nodes[t].x, this.nodes[t].y)
             }
             canvas_context.lineTo(this.nodes[0].x, this.nodes[0].y)
-
             canvas_context.fill()
             canvas_context.stroke()
             canvas_context.closePath()
@@ -732,7 +728,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.color = color
             this.ray = []
             this.rayrange = range
-            this.globalangle = Math.PI/1.35
+            this.globalangle = Math.PI / 1.35
             this.gapangle = angle
             this.currentangle = 0
             this.obstacles = []
@@ -747,7 +743,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 ray.lifespan = this.rayrange - 1
                 ray.angle = this.globalangle + this.currentangle
                 this.ray.push(ray)
-                if(k == this.raymake-1){
+                if (k == this.raymake - 1) {
                     this.farthestrayangle = ray.angle
                     this.raysto = this.farthestrayangle
                 }
@@ -760,21 +756,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             if (this.obstacles[q].isPointInside(this.ray[t])) {
                                 this.ray[t].collided = 1
                                 // if(this.raysto == this.farthestrayangle){
-                                    // this.farthestrayangle = this.ray[t].angle
+                                // this.farthestrayangle = this.ray[t].angle
 
-                                if(this.raysto!=-100){
+                                if (this.raysto != -100) {
                                     this.farthestrayangle = this.ray[t].angle
 
                                 }
                                 // }
                                 this.raysto = -100
-                            }else{ 
-                            // if(this.raysto == this.farthestrayangle){
+                            } else {
+                                // if(this.raysto == this.farthestrayangle){
                                 // if(this.raysto==-100){
                                 //     this.farthestrayangle = this.ray[t].angle
 
                                 // }
-                            // }
+                                // }
                             }
                         }
                     }
@@ -798,7 +794,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.ray = []
         }
     }
-    function setUp(canvas_pass, style = "#FFFFFF") {
+    function setUp(canvas_pass, style = "#AAAAAA") {
         canvas = canvas_pass
         canvas_context = canvas.getContext('2d');
         canvas.style.background = style
@@ -811,26 +807,37 @@ window.addEventListener('DOMContentLoaded', (event) => {
         document.addEventListener('keyup', (event) => {
             delete keysPressed[event.key];
         });
-        // window.addEventListener('pointerdown', e => {
-        //     FLEX_engine = canvas.getBoundingClientRect();
-        //     XS_engine = e.clientX - FLEX_engine.left;
-        //     YS_engine = e.clientY - FLEX_engine.top;
-        //     TIP_engine.x = XS_engine
-        //     TIP_engine.y = YS_engine
-        //     TIP_engine.body = TIP_engine
-        //     // example usage: if(object.isPointInside(TIP_engine)){ take action }
-        //     if (shotarea.isPointInside(TIP_engine)) {
-        //         if (shotpoints.length == 0) {
-        //             shot.x = TIP_engine.x
-        //             shot.y = TIP_engine.y
-        //         }
-        //         shotpoints.push([TIP_engine.x, TIP_engine.y])
-        //     }
-        //     window.addEventListener('pointermove', continued_stimuli);
-        // });
-        // window.addEventListener('pointerup', e => {
-        //     window.removeEventListener("pointermove", continued_stimuli);
-        // })
+        window.addEventListener('pointerdown', e => {
+            FLEX_engine = canvas.getBoundingClientRect();
+            XS_engine = e.clientX - FLEX_engine.left;
+            YS_engine = e.clientY - FLEX_engine.top;
+            TIP_engine.x = XS_engine
+            TIP_engine.y = YS_engine
+            TIP_engine.body = TIP_engine
+
+            for(let t = 0;t<enemies.length;t++){
+                if(enemies[t].body.body.isPointInside(TIP_engine)){
+                    doctress.target = enemies[t]
+                }
+            }
+
+            for(let t = 0;t<doctress.deck[0].buttons.length;t++){
+                if(doctress.deck[0].buttons[t].isPointInside(TIP_engine)){
+
+
+                    doctress.target.health-=doctress.target.colorDistance(doctress.deck[0].buttons[t])
+
+                    let link = new LineOP(doctress.target.body.body,doctress.deck[0].buttons[t], doctress.deck[0].buttons[t].color)
+                    beams.push(link)
+                }
+            }
+            // example usage: if(object.isPointInside(TIP_engine)){ take action }
+           
+            window.addEventListener('pointermove', continued_stimuli);
+        });
+        window.addEventListener('pointerup', e => {
+            window.removeEventListener("pointermove", continued_stimuli);
+        })
 
         canvas.addEventListener('pointermove', continued_stimuli);
         function continued_stimuli(e) {
@@ -889,11 +896,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
     }
+    
     function getRandomLightColor() { // random color that will be visible on  black background
         var letters = '0123456789ABCDEF';
         var color = '#';
         for (var i = 0; i < 6; i++) {
             color += letters[(Math.floor(Math.random() * 12) + 4)];
+        }
+        return color;
+    }
+    function getExtremeColor() { // random color that will be visible on  black background
+        var letters = '012DEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[(Math.floor(Math.random() * 5) + 0)];
         }
         return color;
     }
@@ -924,283 +940,303 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
     let setup_canvas = document.getElementById('canvas') //getting canvas from document
-    let scorecard = document.getElementById('score') //getting canvas from document
     let scoreer = document.getElementById('score') //getting canvas from document
 
     let ballcount = document.getElementById('balls') //getting canvas from document
 
     setUp(setup_canvas) // setting up canvas refrences, starting timer. 
 
-    class Movebeam {
-        constructor(point1, point2) {
-            this.delay = 70
-            this.point1 = point1
-            this.point2 = point2
-            this.body = new LineOP(this.point1, this.point2, "white")
-
-        }
-        move() {
-            this.delay--
-            if (this.delay <= 0) {
-                let bumpx = (this.point1.x - this.point2.x) / 2
-                let bumpy = (this.point1.y - this.point2.y) / 2
-                this.point1.x += bumpx
-                this.point1.y += bumpy
-                this.point2.x += bumpx
-                this.point2.y += bumpy
-            }
-            this.body.draw()
-        }
-
-
-    }
     class Player {
-        constructor() {
-            this.shots = []
-            this.body = new Circle(350, 350, 5, "red")
-            this.counter = 0
-            this.oldpoint = new Point(this.body.x, this.body.y)
-            this.liveshot = new Movebeam(this.body, this.oldpoint)
-
+        constructor(deck) {
+            this.target = {}
+            this.target.body = {}
+            this.target.body.x = 0
+            this.target.body.body = {}
+            this.target.body.body.x = 0
+            this.target.body.body.y = 0
+            this.target.body.y = 0
+            this.deck = [...deck]
+            for (let t = 0; t < this.deck.length; t++) {
+                this.deck[t].owner = this
+            }
         }
-        move() {
-            this.counter++
-            if (gamepadAPI.axesStatus.length > 1) {
-                gamepad_control(this.body, 3.6)
-            }
-            if (keysPressed['w']) {
-                this.body.y -= 1
-            }
-            if (keysPressed['d']) {
-                this.body.x += 1
-            }
+        cardEffects(effect) {
+            switch (effect) {
+                case 0:
 
-            let point = new Point(this.oldpoint.x, this.oldpoint.y)
-            let point2 = new Point(this.body.x, this.body.y)
-            this.liveshot = new Movebeam(point2, point)
-            this.liveshot.move()
-
-            if (this.counter % 6 == 0) {
-                this.shots.push(this.liveshot)
-                this.oldpoint.x = this.body.x
-                this.oldpoint.y = this.body.y
+                    break
             }
-
-            for (let t = 0; t < this.shots.length; t++) {
-                this.shots[t].move()
-            }
-            this.body.draw()
         }
-
-
-    }
-    gamepadAPI.update()
-
-    let droofus = new Player()
-
-    class Collectable{
-        constructor(x,y){
-            this.body = new Polygon(x, y, 5.5, getRandomColor(), Math.floor(Math.random()*7)+3)
-            this.spin = Math.random()*.05
-            this.marked = 0
-        }
-        draw(){
-            this.body.angle+=this.spin
-            this.link = new LineOP(rainbow.center, this.body.body)
-            if(this.link.hypotenuse()< 70){
-                this.body.body.x -= (this.body.body.x-rainbow.center.x)/10
-                this.body.body.y -= (this.body.body.y-rainbow.center.y)/10
+        draw() {
+            for (let t = 0; t < this.deck.length; t++) {
+                this.deck[t].body.x = t * 150
             }
-            if(this.link.hypotenuse()< rainbow.maxsize){
-                this.marked = 1
-            }
-            this.body.draw()
-        }
-        clean(){
-            if(this.marked == 1){
-                rainbow.score+=this.body.sides
-                collectables.splice(collectables.indexOf(this),1)
+            for (let t = 0; t < this.deck.length; t++) {
+                this.deck[t].draw()
             }
         }
 
     }
+
 
 
     class Rainbow {
         constructor(x, y) {
-            this.score = 0
-            this.angle = 0
-            this.tempangle = Math.PI*2
-            this.center = new Circle(x, y, 0, "transparent")
+            this.body = new Circle(x, y, 0, "transparent")
             this.colors = ["red", "orange", "yellow", "#00FF00", "cyan", "blue", "purple"]
-            this.pulse = 10
-            this.pulsebeat = 0
-            this.speed = 2
-            this.blocked = 0
-            this.upblocked = 0
-            this.maxsize = 20
-            // this.ball = new Circle(400,400, 20, "white")
-            // this.ball = new Circle(400,400, 20, "white")
-            // this.observer = new Observer(this.center.x, this.center.y, 0, "red", (3.5*6)+10, 36, Math.PI/2)
         }
         draw() {
-            scorecard.innerText = "Score: " + this.score
-            if(this.blocked == 0){
-                this.center.ymom+=.01
-            }else{
-                this.center.ymom = 0
-            }
-            this.blocked = 0
-            if(this.upblocked > 0){
-                this.upblocked--
-            }
-            
-            for(let t = 0;t<platforms.length;t++){
-                if(platforms[t].isPointInside(this.center)){
-                    if(Math.abs(platforms[t].y-this.center.y) > 5){
-                        if(Math.abs(platforms[t].x-this.center.x) < this.speed){
-                            this.blocked = 1
-                            this.center.ymom = 0
-                        }else if(Math.abs((platforms[t].x+platforms[t].width)-this.center.x) < this.speed){
-                            this.blocked = -1
-                            this.center.ymom = 0
-                        }else{
-                            this.upblocked = 2
-                            this.center.ymom = 0
-                            // if(this.center.ymom < 0){
-                            //     this.center.ymom=0
-                            // }
-                        }
-                    }else{
-                        this.center.y = platforms[t].y
-                        this.center.ymom = 0
-                    }
-                }
-            }
-    
-            if(keysPressed['s']){
-                // this.center.y+=1
-            }
-            this.center.move()
-            canvas_context.translate(0,-this.center.ymom)
-            if(keysPressed['a']){
-                if(this.blocked != -1){
-                this.center.x-=this.speed
-                canvas_context.translate(this.speed,0)
-                }
-            }
-            if(keysPressed['d']){
-                if(this.blocked != 1){
-                    this.center.x+=this.speed
-                    canvas_context.translate(-this.speed,0)
-                }
-            }
-            if(keysPressed['w']){
-                if(this.upblocked == 0){
-                    this.center.y-=2
-                    canvas_context.translate(0,2)
-                    this.center.ymom -= .002
-                }
-            }
-
-            
-
-
-
-            this.pulsebeat+=.03
-            this.pulse = 10 + Math.cos(this.pulsebeat)*4
-            // this.ball.draw()
-            // this.observer = new Observer(this.center.x, this.center.y, 0, "red", (3.5*6)+10, 36, Math.PI/2)
-            // this.observer.obstacles = [this.ball]
             for (let t = 6; t >= 0; t--) {
-                canvas_context.strokeStyle = this.colors[Math.abs(6-t)]
+                canvas_context.strokeStyle = this.colors[Math.abs(6 - t)]
                 canvas_context.beginPath();
                 canvas_context.lineWidth = 4
-                canvas_context.arc(this.center.x, this.center.y, (t * 3.5) + this.pulse, this.tempangle, this.angle, false)
+                canvas_context.arc(this.body.x, this.body.y, (t * 3.5) + this.size, 0, Math.PI * 2, true)
+                if (t == 0) {
+                    canvas_context.fillStyle = "black"
+                    canvas_context.fill()
+                }
                 canvas_context.stroke();
             }
-            // this.observer.draw()
-            // this.angle = this.observer.farthestrayangle
-    
         }
+    }
 
+    class Card {
+        constructor(functionset, type) {
+            this.owner = {}
+            this.type = type
+            this.body = new Rectangle(0, 225, 150, 250, "black")
+            this.pulse = 10
+            this.health = 100
+            this.maxhealth = 100
+            this.pulsebeat = 0
+            // this.smartpulse = Math.random() * .05
+
+            this.buttons = []
+
+            this.dis = 180
+            this.angle = (Math.PI * 2) - (Math.PI / 3.5)
+
+            switch (this.type) {
+                case 0:
+                    this.icon = new Polygon(this.body.x + this.body.width / 2, this.body.y + this.body.height / 2, 13, "yellow", 3)
+                    this.icon.angle += Math.PI / 2 + Math.PI
+                    break
+                case 1:
+                    this.icon = new Polygon(this.body.x + this.body.width / 2, this.body.y + this.body.height / 2, 13, "red", 4)
+                    this.icon.angle += Math.PI / 4
+                    break
+                case 2:
+                    this.icon = new Polygon(this.body.x + this.body.width / 2, this.body.y + this.body.height / 2, 13, "Orange", 5)
+                    this.icon.angle += Math.PI / 2 + Math.PI
+                    break
+                case 3:
+                    this.icon = new Polygon(this.body.x + this.body.width / 2, this.body.y + this.body.height / 2, 13, "white", 6)
+                    this.icon.angle += Math.PI / 6
+                    break
+                case 4:
+                    this.icon = new Polygon(this.body.x + this.body.width / 2, this.body.y + this.body.height / 2, 13, "#00ff00", 7)
+                    this.icon.angle += Math.PI / 2 + Math.PI
+                    break
+                case 5:
+                    this.icon = new Rainbow(this.body.x + this.body.width / 2, this.body.y + this.body.height / 2)
+                    this.icon.size = 13
+                    this.icon.angle += Math.PI / 2 + Math.PI
+                    break
+                case 6:
+                    this.icon = new Polygon(this.body.x + this.body.width / 2, this.body.y + this.body.height / 2, 13, "pink", 2)
+                    this.icon.size = 13
+                    this.icon.angle += Math.PI / 2 + Math.PI
+                    break
+            }
+
+
+            for (let t = 0; t < 8; t++) {
+                let button = new Circle(0, 0, 20, "transparent")
+
+                switch (t) {
+                    case 0:
+                        button.color = "red"
+                        button.r = 255
+                        button.g = 0
+                        button.b = 0
+                        break;
+                    case 1:
+                        button.color = "orange"
+                        button.r = 200
+                        button.g = 65
+                        button.b = 0
+                        break;
+                    case 2:
+                        button.color = "yellow"
+                        button.r = 145
+                        button.g = 145
+                        button.b = 0
+                        break;
+                    case 3:
+                        button.color = "#00FF00"
+                        button.r = 0
+                        button.g = 255
+                        button.b = 0
+                        break;
+                    case 4:
+                        button.color = "cyan"
+                        button.r = 0
+                        button.g = 145
+                        button.b = 145
+                        break;
+                    case 5:
+                        button.color = "blue"
+                        button.r = 0
+                        button.g = 0
+                        button.b = 255
+                        break;
+                    case 6:
+                        button.color = "purple"
+                        button.r = 145
+                        button.g = 0
+                        button.b = 145
+                        break;
+
+                    default:
+                        button.color = "black"
+                        button.r = 90
+                        button.g = 90
+                        button.b = 90
+                        break;
+                }
+
+                button.x = this.icon.body.x + this.dis * (Math.cos(this.angle))
+                button.y = this.icon.body.y + this.dis * (Math.sin(this.angle))
+
+
+                this.angle += ((Math.PI / 3.5) / 3.5)
+                this.buttons.push(button)
+            }
+
+            this.player = [...functionset]
+        }
+        play() {
+            for (let t = 0; t < this.player.length; t++) {
+                this.owner.cardEffects(this.player[t])
+            }
+        }
+        draw() {
+            this.smartpulse = (this.health / this.maxhealth) * .05
+            this.pulsebeat += this.smartpulse
+            this.pulse = 13 + Math.cos(this.pulsebeat) * 5
+            // this.body.draw()
+            this.icon.size = this.pulse
+            this.icon.body.x = this.body.x + this.body.width / 2
+            this.icon.body.y = this.body.y + this.body.height / 2
+            this.icon.draw()
+            for (let t = 0; t < this.buttons.length; t++) {
+                this.buttons[t].draw()
+            }
+        }
 
     }
 
-    let collectables = []
+    class Enemy {
+        constructor(sides) {
+            this.body = new Polygon(0, 0, 14, getExtremeColor(), sides)
 
-
-    let rainbow = new Rainbow(350, 350)
-
-    let platforms = []
-
-    let platform1 = new Rectangle(-1000, 500, 10000, 10000, "black")
-    let platform2 = new Rectangle(500, 300, 200, 10000, "black")
-    let platform3 = new Rectangle(0, 300, 280, 70, "black")
-    platforms.push(platform1)
-    platforms.push(platform2)
-    platforms.push(platform3)
-    let platform4 = new Rectangle(1100, 300, 280, 70, "black")
-    platforms.push(platform4)
-    let platform5 = new Rectangle(1700, 100, 280, 70, "black")
-    platforms.push(platform5)
-    let platform6 = new Rectangle(-700, -10000, 800, 70000, "black")
-    platforms.push(platform6)
-    let platform7 = new Rectangle(1100, -100, 280, 70, "black")
-    platforms.push(platform7)
-    let platform8 = new Rectangle(700, -300, 280, 70, "black")
-    platforms.push(platform8)
-    let platform9 = new Rectangle(100, -400, 280, 70, "black")
-    platforms.push(platform9)
-    let platform10 = new Rectangle(100, -600, 180, 70, "black")
-    platforms.push(platform10)
-    let platform11 = new Rectangle(100, -800, 80, 70, "black")
-    platforms.push(platform11)
-    let platform12 = new Rectangle(400, -900, 580, 70, "black")
-    platforms.push(platform12)
-    let platform13 = new Rectangle(1900, -910, 570, 70, "black")
-    platforms.push(platform13)
-
-    let platform14 = new Rectangle(2400, -10000, 800, 70000, "black")
-    platforms.push(platform14)
-
-    for(let t = 0;t<500;t++){
-        let wet = 0
-        let gem = new Collectable(Math.random()*2800, -1500+Math.random()*2000)
-        for(let k = 0;k<collectables.length;k++){
-            let link = new LineOP(gem.body.body, collectables[k].body.body)
-            if(link.hypotenuse() < 35){
-                wet = 1
+            this.r = Math.random()*32
+            if(Math.random()<.5){
+                this.r += 223
             }
-        }
-        for(let k = 0;k<platforms.length;k++){
-            if(platforms[k].isPointInside(gem.body.body)){
-                wet = 1
+            this.g = Math.random()*32
+            if(Math.random()<.5){
+                this.g += 223
             }
+            this.b = Math.random()*32
+            if(Math.random()<.5){
+                this.b += 223
+            }
+            this.health = 2000
+            this.maxhealth = 2000
+            this.pulsebeat = 0
         }
-        if(wet == 0)[
-            collectables.push(gem)
-        ]
+        draw() {
+            if(this.health < 0){
+                this.health = 0
+            }
+            this.smartpulse = (this.health / this.maxhealth) * .05
+            this.pulsebeat += this.smartpulse
+            this.pulse = 13 + Math.cos(this.pulsebeat) * 5
+            // this.body.draw()
+            this.body.size = this.pulse
+            this.body.color = `rgb(${this.r},${this.g},${this.b})`
+            this.body.draw()
+        }
+
+        colorDistance(target){
+            let rk = (this.r-target.r)*(this.r-target.r)
+            let gk = (this.g-target.g)*(this.g-target.g)
+            let bk = (this.b-target.b)*(this.b-target.b)
+
+            return Math.sqrt(rk+bk+gk)
+
+        }
+
     }
+
+    let enemynexus = {}
+    enemynexus.x = 1050
+    enemynexus.y = 350
+
+    let enemies = []
+    let enemydis = 180
+
+    let enemynum = Math.floor(Math.random() * 10)+1
+    for (let t = 0; t < enemynum; t++) {
+        let enemy = new Enemy(Math.floor(Math.random() * 5) + 3)
+        enemies.push(enemy)
+    }
+
+    let decktress = []
+
+    let card1 = new Card([1, 1, 1, 1, 1, 1, 1], 5)
+    decktress.push(card1)
+    // let card2 = new Card([0,1,0], 1)
+    // decktress.push(card2)
+    // let card3 = new Card([1,0,0], 2)
+    // decktress.push(card3)
+    // let card4 = new Card([0,1,1], 3)
+    // decktress.push(card4)
+    // let card5 = new Card([1,0,1], 4)
+    // decktress.push(card5)
+    // let card6 = new Card([1,1,0], 5)
+    // decktress.push(card6)
+    // let card7 = new Card([1,1,1], 6)
+    // decktress.push(card7)
+
+    let beams = []
+
+    let doctress = new Player(decktress)
 
     function main() {
-        canvas_context.clearRect(-10000, -10000, canvas.width*10000, canvas.height*10000)  // refreshes the image
-        // canvas_context.fillStyle = `rgba(0,0,0,.01)`
-        // canvas_context.fillRect(0,0,canvas.width, canvas.height)
+        canvas_context.clearRect(0, 0, canvas.width, canvas.height)  // refreshes the image
         gamepadAPI.update() //checks for button presses/stick movement on the connected controller)
-        // droofus.move()
+        doctress.draw()
+        let enemyangle = (Math.PI) - (Math.PI/3)
+        if(enemies.length == 1){
+            enemyangle  = Math.PI
+        }
 
-        rainbow.draw()
-        for(let t = 0;t<platforms.length;t++){
-            platforms[t].draw()
+        canvas_context.beginPath()
+        canvas_context.strokeStyle = "white"
+        canvas_context.lineWidth = 4
+        canvas_context.arc(doctress.target.body.body.x, doctress.target.body.body.y, 30, 0, (Math.PI * 2), true)
+        canvas_context.stroke()
+        for (let t = 0; t < enemies.length; t++) {
+            enemies[t].body.body.x = enemynexus.x + (enemydis * (Math.cos(enemyangle)))
+            enemies[t].body.body.y = enemynexus.y + (enemydis * (Math.sin(enemyangle)))
+            enemies[t].draw()
+            enemyangle+=((Math.PI-(Math.PI/3) )/ ((enemies.length-1) ))
         }
-        for(let t = 0;t<collectables.length;t++){
-            collectables[t].draw()
+        for (let t = 0; t < beams.length; t++) {
+            beams[t].draw()
         }
-        for(let t = 0;t<collectables.length;t++){
-            collectables[t].clean()
-        }
-        song.play()
     }
 
 

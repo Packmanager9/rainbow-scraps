@@ -1,7 +1,7 @@
 
 
 let song = new Audio()
-song.src = `primes3.mp3`
+song.src = `primes.wav`
 window.addEventListener('DOMContentLoaded', (event) => {
     const gamepadAPI = {
         controller: {},
@@ -924,7 +924,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
     let setup_canvas = document.getElementById('canvas') //getting canvas from document
-    let scorecard = document.getElementById('score') //getting canvas from document
     let scoreer = document.getElementById('score') //getting canvas from document
 
     let ballcount = document.getElementById('balls') //getting canvas from document
@@ -1018,7 +1017,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
         clean(){
             if(this.marked == 1){
-                rainbow.score+=this.body.sides
                 collectables.splice(collectables.indexOf(this),1)
             }
         }
@@ -1044,12 +1042,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             // this.observer = new Observer(this.center.x, this.center.y, 0, "red", (3.5*6)+10, 36, Math.PI/2)
         }
         draw() {
-            scorecard.innerText = "Score: " + this.score
-            if(this.blocked == 0){
-                this.center.ymom+=.01
-            }else{
-                this.center.ymom = 0
-            }
+
+            this.center.ymom+=.01
             this.blocked = 0
             if(this.upblocked > 0){
                 this.upblocked--
@@ -1060,13 +1054,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if(Math.abs(platforms[t].y-this.center.y) > 5){
                         if(Math.abs(platforms[t].x-this.center.x) < this.speed){
                             this.blocked = 1
-                            this.center.ymom = 0
                         }else if(Math.abs((platforms[t].x+platforms[t].width)-this.center.x) < this.speed){
                             this.blocked = -1
-                            this.center.ymom = 0
                         }else{
                             this.upblocked = 2
-                            this.center.ymom = 0
                             // if(this.center.ymom < 0){
                             //     this.center.ymom=0
                             // }
@@ -1161,8 +1152,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let platform13 = new Rectangle(1900, -910, 570, 70, "black")
     platforms.push(platform13)
 
-    let platform14 = new Rectangle(2400, -10000, 800, 70000, "black")
-    platforms.push(platform14)
 
     for(let t = 0;t<500;t++){
         let wet = 0
