@@ -1049,12 +1049,43 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     let doctress = new Player(decktress)
 
+    let counter = 0
     function main() {
         canvas_context.clearRect(0, 0, canvas.width, canvas.height)  // refreshes the image
         gamepadAPI.update() //checks for button presses/stick movement on the connected controller)
         doctress.draw()
+
+
+
+        // counter += .1
+
+        //     const imageData = canvas_context.getImageData(0, 0, canvas.width, canvas.height);
+        //     const data = imageData.data;
+        //     for (var i = 0; i < data.length; i += 4) {
+        //         data[i] = (Math.random() + .51) * data[i]  // red
+        //         data[i + 1] = (Math.random() + .51) * data[i + 1] // green
+        //         data[i + 2] = (Math.random() + .51) * data[i + 2]  // blue
+        //     }
+        //     canvas_context.putImageData(imageData, 0, 0);
+        //     canvas_context.drawImage(canvas, -2 * Math.cos(counter), -2 * Math.sin(counter))
     }
 
+
+        counter += .1
+
+        if (whackout == 1) {
+            centers[centers.length - 1].draw()
+            const imageData = canvas_context.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            for (var i = 0; i < data.length; i += 4) {
+                data[i] = (Math.random() + .51) * data[i]  // red
+                data[i + 1] = (Math.random() + .51) * data[i + 1] // green
+                data[i + 2] = (Math.random() + .51) * data[i + 2]  // blue
+            }
+            canvas_context.putImageData(imageData, 0, 0);
+            canvas_context.drawImage(canvas, -2 * Math.cos(counter), -2 * Math.sin(counter))
+            centers[centers.length - 1].draw()
+        }
 
 
 })

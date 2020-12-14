@@ -431,7 +431,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
         isPointInside(point) { // rough approximation
-            this.body.radius = this.size *2
+            this.body.radius = this.size * 2
             if (this.sides <= 2) {
                 return false
             }
@@ -815,24 +815,30 @@ window.addEventListener('DOMContentLoaded', (event) => {
             TIP_engine.y = YS_engine
             TIP_engine.body = TIP_engine
 
-            for(let t = 0;t<enemies.length;t++){
-                if(enemies[t].body.body.isPointInside(TIP_engine)){
+            for (let t = 0; t < enemies.length; t++) {
+                if (enemies[t].body.body.isPointInside(TIP_engine)) {
                     doctress.target = enemies[t]
                 }
             }
 
-            for(let t = 0;t<doctress.deck[0].buttons.length;t++){
-                if(doctress.deck[0].buttons[t].isPointInside(TIP_engine)){
+            for (let t = 0; t < doctress.deck[0].buttons.length; t++) {
+                if (doctress.deck[0].icon.powers[t] >= 10) {
+                    if (doctress.deck[0].buttons[t].isPointInside(TIP_engine)) {
 
 
-                    doctress.target.health-=doctress.target.colorDistance(doctress.deck[0].buttons[t])
+                        doctress.target.health -= doctress.target.colorDistance(doctress.deck[0].buttons[t])
+                        // doctress.deck[0].icon.powers[t] -= 10
 
-                    let link = new LineOP(doctress.target.body.body,doctress.deck[0].buttons[t], doctress.deck[0].buttons[t].color)
-                    beams.push(link)
+                        let link = new LineOP(doctress.target.body.body, doctress.deck[0].buttons[t], doctress.deck[0].buttons[t].color, 9)
+                        beams.push(link)
+                        let beamdot = new Circle(link.target.x, link.target.y, 5, link.color)
+                        beamdot.width = 9
+                        beams.push(beamdot)
+                    }
                 }
             }
             // example usage: if(object.isPointInside(TIP_engine)){ take action }
-           
+
             window.addEventListener('pointermove', continued_stimuli);
         });
         window.addEventListener('pointerup', e => {
@@ -896,7 +902,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
     }
-    
+
     function getRandomLightColor() { // random color that will be visible on  black background
         var letters = '0123456789ABCDEF';
         var color = '#';
@@ -984,13 +990,26 @@ window.addEventListener('DOMContentLoaded', (event) => {
         constructor(x, y) {
             this.body = new Circle(x, y, 0, "transparent")
             this.colors = ["red", "orange", "yellow", "#00FF00", "cyan", "blue", "purple"]
+            this.powers = [100, 100, 100, 100, 100, 100, 100, 100]
+            this.powerstack = []
+            this.size  = 13
         }
         draw() {
+            let powerdrawratio = 13.5 / 100
+            let power = 0
+            this.powerstack = []
             for (let t = 6; t >= 0; t--) {
+                power += this.powers[t]
+                this.powerstack.push(power)
+            }
+
+
+
+            for (let t = 7; t >= 0; t--) {
                 canvas_context.strokeStyle = this.colors[Math.abs(6 - t)]
                 canvas_context.beginPath();
-                canvas_context.lineWidth = 4
-                canvas_context.arc(this.body.x, this.body.y, (t * 3.5) + this.size, 0, Math.PI * 2, true)
+                canvas_context.lineWidth = this.powers[t] * powerdrawratio
+                canvas_context.arc(this.body.x, this.body.y, this.powerstack[t] * powerdrawratio + this.size, 0, Math.PI * 2, true)
                 if (t == 0) {
                     canvas_context.fillStyle = "black"
                     canvas_context.fill()
@@ -1004,7 +1023,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         constructor(functionset, type) {
             this.owner = {}
             this.type = type
-            this.body = new Rectangle(0, 225, 150, 250, "black")
+            this.body = new Rectangle(0, 225, 240, 250, "black")
             this.pulse = 10
             this.health = 100
             this.maxhealth = 100
@@ -1140,16 +1159,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
         constructor(sides) {
             this.body = new Polygon(0, 0, 14, getExtremeColor(), sides)
 
-            this.r = Math.random()*32
-            if(Math.random()<.5){
+            this.r = Math.random() * 32
+            if (Math.random() < .5) {
                 this.r += 223
             }
-            this.g = Math.random()*32
-            if(Math.random()<.5){
+            this.g = Math.random() * 32
+            if (Math.random() < .5) {
                 this.g += 223
             }
-            this.b = Math.random()*32
-            if(Math.random()<.5){
+            this.b = Math.random() * 32
+            if (Math.random() < .5) {
                 this.b += 223
             }
             this.health = 2000
@@ -1157,7 +1176,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.pulsebeat = 0
         }
         draw() {
-            if(this.health < 0){
+            if (this.health < 0) {
                 this.health = 0
             }
             this.smartpulse = (this.health / this.maxhealth) * .05
@@ -1167,14 +1186,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body.size = this.pulse
             this.body.color = `rgb(${this.r},${this.g},${this.b})`
             this.body.draw()
+            canvas_context.fillStyle = "black"
+            canvas_context.font = "14px arial"
+            canvas_context.fillText(`${Math.round(this.health)}/${Math.round(this.maxhealth)}`, this.body.body.x + 20, this.body.body.y + 5)
         }
 
-        colorDistance(target){
-            let rk = (this.r-target.r)*(this.r-target.r)
-            let gk = (this.g-target.g)*(this.g-target.g)
-            let bk = (this.b-target.b)*(this.b-target.b)
+        colorDistance(target) {
+            let rk = (this.r - target.r) * (this.r - target.r)
+            let gk = (this.g - target.g) * (this.g - target.g)
+            let bk = (this.b - target.b) * (this.b - target.b)
 
-            return Math.sqrt(rk+bk+gk)
+            return Math.sqrt(rk + bk + gk)
 
         }
 
@@ -1187,7 +1209,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let enemies = []
     let enemydis = 180
 
-    let enemynum = Math.floor(Math.random() * 10)+1
+    let enemynum = Math.floor(Math.random() * 10) + 1
     for (let t = 0; t < enemynum; t++) {
         let enemy = new Enemy(Math.floor(Math.random() * 5) + 3)
         enemies.push(enemy)
@@ -1212,33 +1234,94 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     let beams = []
 
+    let counter = 0
     let doctress = new Player(decktress)
 
     function main() {
         canvas_context.clearRect(0, 0, canvas.width, canvas.height)  // refreshes the image
         gamepadAPI.update() //checks for button presses/stick movement on the connected controller)
         doctress.draw()
-        let enemyangle = (Math.PI) - (Math.PI/3)
-        if(enemies.length == 1){
-            enemyangle  = Math.PI
+        let enemyangle = (Math.PI) - (Math.PI / 3)
+        if (enemies.length == 1) {
+            enemyangle = Math.PI
         }
 
         canvas_context.beginPath()
         canvas_context.strokeStyle = "white"
         canvas_context.lineWidth = 4
+
+        if(enemies.includes(doctress.target)){
         canvas_context.arc(doctress.target.body.body.x, doctress.target.body.body.y, 30, 0, (Math.PI * 2), true)
+        }
         canvas_context.stroke()
         for (let t = 0; t < enemies.length; t++) {
             enemies[t].body.body.x = enemynexus.x + (enemydis * (Math.cos(enemyangle)))
             enemies[t].body.body.y = enemynexus.y + (enemydis * (Math.sin(enemyangle)))
             enemies[t].draw()
-            enemyangle+=((Math.PI-(Math.PI/3) )/ ((enemies.length-1) ))
+            enemyangle += ((Math.PI - (Math.PI / 3)) / ((enemies.length - 1)))
         }
+        for (let t = 0; t < enemies.length; t++) {
+            if(enemies[t].health <= 0){
+                if(enemies[t] == doctress.target){
+                    doctress.target = enemies[Math.floor(enemies.length*Math.random())]
+                }
+                enemies.splice(t,1)
+            }
+        }
+
+        if(!enemies.includes(doctress.target)){
+            doctress.target = enemies[Math.floor(enemies.length*Math.random())]
+        }
+        if(enemies.length == 0){
+            for (let t = 0; t < enemynum; t++) {
+                let enemy = new Enemy(Math.floor(Math.random() * 5) + 3)
+                enemies.push(enemy)
+            }        
+        }
+
+        counter += .1
+
+            const imageData = canvas_context.getImageData(0, 0, canvas.width, canvas.height);
+            // canvas_context.clearRect(0,0,10000,10000)
+            const data = imageData.data;
+            for (var i = 0; i < data.length; i += 4) {
+                if(Math.floor((i/4)%1050 < 500)){
+                    data[i] = (Math.random() + .51) * data[i]  // red
+                    data[i + 1] = (Math.random() + .51) * data[i + 1] // green
+                    data[i + 2] = (Math.random() + .51) * data[i + 2]  // blue
+                }
+            }
+            canvas_context.putImageData(imageData, 0, 0);
+            // canvas_context.drawImage(canvas, -200 * Math.cos(counter), -200 * Math.sin(counter))
+
+
         for (let t = 0; t < beams.length; t++) {
             beams[t].draw()
+            beams[t].width *= .975
+            if(typeof beams[t].radius != "number"){
+                beams[t].radius = beams[t].width
+            }
         }
+        for (let t = 0; t < beams.length; t++) {
+            if (beams[t].width <= 1) {
+                beams.splice(t, 1)
+            }
+        }
+        // for (let t = 0; t < beams.length; t++) {
+        //     if(typeof beams[t].radius != "number"){
+        //         if (!enemies.includes(beams[t].target)) {
+        //             beams.splice(t, 1)
+        //         }
+        //     }
+        // }
     }
 
 
 
 })
+
+let count = 0
+for(let t = 40;t>0;t--){
+    count+=t
+}
+console.log(count)
